@@ -1,0 +1,303 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student
+{
+public:
+    string name;
+    int id;
+    double grade;
+
+    Student()
+    {
+        name = "";
+        id = 0;
+        grade = 0;
+    }
+
+    Student(string n, int i, double g)
+    {
+        name = n;
+        id = i;
+        grade = g;
+    }
+
+    void print()
+    {
+        cout << name << "\t" << id << "\t" << grade << endl;
+    }
+};
+
+// Bubble Sort - O(n^2)
+void sortByGrade(Student arr[], int n)
+{
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = 0; j < n - i - 1; j++)
+        {
+            if (arr[j].grade < arr[j + 1].grade)
+            {
+                Student temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Bubble Sort by ID - O(n^2)
+void sortByID(Student arr[], int n)
+{
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = 0; j < n - i - 1; j++)
+        {
+            if (arr[j].id > arr[j + 1].id)
+            {
+                Student temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Linear Search - O(n)
+int linearSearch(Student arr[], int n, string name, int& comparisons)
+{
+    comparisons = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        comparisons++;
+
+        if (arr[i].name == name)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+// Binary Search - O(log n)
+int binarySearch(Student arr[], int n, int id, int& comparisons)
+{
+    int left = 0;
+    int right = n - 1;
+
+    comparisons = 0;
+
+    while (left <= right)
+    {
+        int middle = (left + right) / 2;
+
+        comparisons++;
+
+        if (arr[middle].id == id)
+        {
+            return middle;
+        }
+        else if (arr[middle].id < id)
+        {
+            left = middle + 1;
+        }
+        else
+        {
+            right = middle - 1;
+        }
+    }
+
+    return -1;
+}
+
+// Recursion - O(n)
+double totalGrades(Student arr[], int n)
+{
+    if (n == 0)
+    {
+        return 0;
+    }
+
+    return arr[n - 1].grade + totalGrades(arr, n - 1);
+}
+
+int main()
+{
+    Student students[100];
+    int count = 0;
+    int choice;
+
+    do
+    {
+        cout << "\n===== Student Grade System =====\n";
+        cout << "1. Add Student\n";
+        cout << "2. Display All Students\n";
+        cout << "3. Sort Students by Grade\n";
+        cout << "4. Search by Name\n";
+        cout << "5. Search by ID\n";
+        cout << "6. Statistics\n";
+        cout << "7. Exit\n";
+
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (choice == 1)
+        {
+            string name;
+            int id;
+            double grade;
+
+            cout << "Enter name: ";
+            cin >> name;
+
+            cout << "Enter ID: ";
+            cin >> id;
+
+            cout << "Enter grade: ";
+            cin >> grade;
+
+            students[count] = Student(name, id, grade);
+            count++;
+
+            cout << "Student added successfully!\n";
+        }
+
+        else if (choice == 2)
+        {
+            cout << "\nName\tID\tGrade\n";
+
+            for (int i = 0; i < count; i++)
+            {
+                students[i].print();
+            }
+        }
+
+        else if (choice == 3)
+        {
+            sortByGrade(students, count);
+
+            cout << "\nRank\tName\tID\tGrade\n";
+
+            for (int i = 0; i < count; i++)
+            {
+                cout << i + 1 << "\t";
+                students[i].print();
+            }
+        }
+
+        else if (choice == 4)
+        {
+            string name;
+            int comparisons;
+
+            cout << "Enter name: ";
+            cin >> name;
+
+            int result = linearSearch(
+                students,
+                count,
+                name,
+                comparisons
+            );
+
+            if (result != -1)
+            {
+                cout << "Student Found:\n";
+                students[result].print();
+            }
+            else
+            {
+                cout << "Student not found.\n";
+            }
+
+            cout << "Comparisons: " << comparisons << endl;
+        }
+
+        else if (choice == 5)
+        {
+            int id;
+            int comparisons;
+
+            cout << "Enter ID: ";
+            cin >> id;
+
+            sortByID(students, count);
+
+            int result = binarySearch(
+                students,
+                count,
+                id,
+                comparisons
+            );
+
+            if (result != -1)
+            {
+                cout << "Student Found:\n";
+                students[result].print();
+            }
+            else
+            {
+                cout << "Student not found.\n";
+            }
+
+            cout << "Comparisons: " << comparisons << endl;
+        }
+
+        else if (choice == 6)
+        {
+            if (count == 0)
+            {
+                cout << "No students available.\n";
+            }
+            else
+            {
+                int highest = 0;
+                int lowest = 0;
+
+                for (int i = 1; i < count; i++)
+                {
+                    if (students[i].grade > students[highest].grade)
+                    {
+                        highest = i;
+                    }
+
+                    if (students[i].grade < students[lowest].grade)
+                    {
+                        lowest = i;
+                    }
+                }
+
+                double total = totalGrades(students, count);
+                double average = total / count;
+
+                cout << "\nHighest Grade: "
+                    << students[highest].grade
+                    << " - "
+                    << students[highest].name << endl;
+
+                cout << "Lowest Grade: "
+                    << students[lowest].grade
+                    << " - "
+                    << students[lowest].name << endl;
+
+                cout << "Class Average: "
+                    << average << endl;
+            }
+        }
+
+        else if (choice == 7)
+        {
+            cout << "Goodbye!\n";
+        }
+
+        else
+        {
+            cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 7);
+
+    return 0;
+}
